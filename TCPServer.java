@@ -1,5 +1,3 @@
-package rtt_ud_tcp;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,21 +10,27 @@ public class TCPServer {
 		ServerSocket ss = new ServerSocket(7000);
 		Socket s = ss.accept();
 
-		InputStream is = s.getInputStream();// canal de entrada
-		OutputStream os = s.getOutputStream();// canal de saida
-		byte[] buffReceive = new byte[1];
+		InputStream is = s.getInputStream();
+		OutputStream os = s.getOutputStream();
+		// byte[] buffReceive = new byte[1];
+		int[] size = { 1, 8, 16, 32, 64, 128, 256, 512, 1024 };
+		for (int j = 0; j < size.length; j++) {
+			for (int i = 1; i <= 10; i++) {
 
-		for (int i = 1; i <= 10; i++) {
-			System.out.println("Rodada " + i);
-			int count = 0;
-			while (count < 100) {
-				is.read(buffReceive);
-				os.write(buffReceive);
+				byte[] buffReceive = new byte[size[j]];
 
-				System.out.print("Recebido!" + " - ");
-				++count;
+				//System.out.println("Rodada " + i + " - Tamanho do Buffer " + size[j]);
+				int count = 0;
+				while (count < 100) {
+					is.read(buffReceive);
+					os.write(buffReceive);
+
+					//System.out.print("Recebido!" + " - ");
+					++count;
+				}
+				System.out.println();
 			}
-			System.out.println();
 		}
+
 	}
 }
