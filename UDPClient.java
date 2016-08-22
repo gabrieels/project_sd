@@ -12,20 +12,25 @@ public class UDPClient {
 
 	public static void main(String[] args) throws UnknownHostException {
 		DatagramSocket sock = null;
-		byte[] buffer = new byte[1];
-		InetAddress ip = InetAddress.getByName("ec2-54-149-218-127.us-west-2.compute.amazonaws.com");
-		System.out.println("Meu IP: " + ip);
-		
+		byte[] buffSend = new byte[1];
+		byte[] buffReceive = new byte[1];
+		InetAddress ip = InetAddress.getByName("ec2-54-86-43-91.compute-1.amazonaws.com");
+			
 		try {
-			for (int i = 1; i <= 10; i++) {
-				System.out.println("Rodada " + i);
-				int count = 0;
-				while (count < RTT) {
-					long tempoInicial = System.currentTimeMillis();
-					sock = new DatagramSocket(3000);
+			
 
-					DatagramPacket pack = new DatagramPacket(buffer, buffer.length, InetAddress.getLocalHost(), 5000);
+			for (int i = 1; i <= 10; i++) {
+				int count = 0;
+				System.out.println("Rodada " + i + " Buffer " + buffSend.length);
+				while (count < RTT) {
+					sock = new DatagramSocket(3000);
+					DatagramPacket pack = new DatagramPacket(buffSend, buffSend.length, ip, 6789);
+					DatagramPacket reply = new DatagramPacket(buffReceive, buffReceive.length);
+					
+					long tempoInicial = System.currentTimeMillis();
+					
 					sock.send(pack);
+					sock.receive(reply); //bloqueante
 					
 					System.out.print(System.currentTimeMillis() - tempoInicial + " - ");
 					++count;

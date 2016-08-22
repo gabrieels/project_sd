@@ -14,14 +14,15 @@ public class UDPServer {
 		try {
 			// reserva uma porta livre para a aplicacao
 			sock = new DatagramSocket(6789);
-			byte[] buffer = new byte[1];
+			byte[] buffReceive = new byte[1];
+			byte[] bufferSend = new byte[1];
 			
 			while (true) {
 				
-				DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
+				DatagramPacket receivePacket = new DatagramPacket(buffReceive, buffReceive.length);
 				sock.receive(receivePacket); // operacao bloqueante
 
-				DatagramPacket reply = new DatagramPacket(buffer, buffer.length, receivePacket.getAddress(),
+				DatagramPacket reply = new DatagramPacket(bufferSend, bufferSend.length, receivePacket.getAddress(),
 						receivePacket.getPort());
 
 				sock.send(reply);

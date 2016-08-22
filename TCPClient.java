@@ -1,41 +1,69 @@
+package rtt_ud_tcp;
+
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 public class TCPClient {
 
 	static final int RTT = 100;
 
 	public static void main(String[] args) throws IOException {
-		// ec2-54-197-8-9.compute-1.amazonaws.com
-		Socket s = new Socket("localhost", 7000);
+		String dns = "ec2-54-86-43-91.compute-1.amazonaws.com";
+		Socket s = null;
+		HSSFWorkbook workbook = new HSSFWorkbook();
 
-		InputStream is = s.getInputStream();
-		OutputStream os = s.getOutputStream();
+		try {
 
-		int[] size = { 1, 8, 16, 32, 64, 128, 256, 512, 1024 };
-		for (int j = 0; j < size.length; j++) {
-			for (int i = 1; i <= 10; i++) {
+			s = new Socket(dns, 7000);
+			InputStream is = s.getInputStream();
+			OutputStream os = s.getOutputStream();
 
-				byte[] buffSend = new byte[size[j]];
-				byte[] buffReceive = new byte[size[j]];
+			int[] size = { 1, 8, 16, 32, 64, 128, 256, 512, 1024 };
+			
+			for (int j = 0; j < size.length; j++) {
+				HSSFSheet sheet = workbook.createSheet(size[j] + "Bytes");
 
-				System.out.println("Rodada " + i + " - Tamanho do Buffer " + size[j]);
-				int count = 0;
-				while (count < RTT) {
-					long tempoInicial = System.currentTimeMillis();
+				int rownum = 0;
+				for (int i = 0; i < 10; i++) {
+					HSSFRow row = sheet.createRow(rownum++);
+					
+					byte[] buffSend = new byte[size[j]];
+					byte[] buffReceive = new byte[size[j]];
+					System.out.println("Rodada " + i + " Buffer " + buffSend.length);
+					int count = 0;
+					int numCell = 0;
+					while (count < 100) {
+						long tempoInicial = System.currentTimeMillis();
 
-					os.write(buffSend);
-					is.read(buffReceive);
+						os.write(buffSend);
+						is.read(buffReceive);
+						
+						HSSFCell cell = row.createCell(numCell++);
+						long tempoFinal = System.currentTimeMillis();
+						cell.setCellValue( tempoFinal - tempoInicial);
+						System.out.println(tempoFinal - tempoInicial + ", ");
 
-					System.out.print(System.currentTimeMillis() - tempoInicial + ", ");
-					++count;
+						++count;
+					}
 				}
-				System.out.println();
 			}
-		}
+			workbook.write(new FileOutputStream("dados.xls"));
+			workbook.close();
 
-		s.close();
+			System.err.println("Write successfully");
+
+			s.close();
+
+		} catch (Exception e) {
+			System.err.println("Error in writing to file");
+		}
 	}
 }
