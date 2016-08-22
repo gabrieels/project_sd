@@ -12,33 +12,38 @@ public class UDPClient {
 
 	public static void main(String[] args) throws UnknownHostException {
 		DatagramSocket sock = null;
-		byte[] buffSend = new byte[1];
+		
 		byte[] buffReceive = new byte[1];
-		InetAddress ip = InetAddress.getByName("ec2-54-86-43-91.compute-1.amazonaws.com");
-			
-		try {
-			
+		int[] size = { 1, 8, 16, 32, 64, 128, 256, 512, 1024 };
 
-			for (int i = 1; i <= 10; i++) {
-				int count = 0;
-				System.out.println("Rodada " + i + " Buffer " + buffSend.length);
-				while (count < RTT) {
-					sock = new DatagramSocket(3000);
-					DatagramPacket pack = new DatagramPacket(buffSend, buffSend.length, ip, 6789);
-					DatagramPacket reply = new DatagramPacket(buffReceive, buffReceive.length);
+		InetAddress ip = InetAddress.getByName("localhost");
+
+		try {
+			for (int j = 0; j < size.length; j++) {
+				for (int i = 1; i <= 10; i++) {
+					byte[] buffSend = new byte[size[j]];
+					int count = 0;
 					
-					long tempoInicial = System.currentTimeMillis();
-					
-					sock.send(pack);
-					sock.receive(reply); //bloqueante
-					
-					System.out.print(System.currentTimeMillis() - tempoInicial + " - ");
-					++count;
-					
-					sock.close();
+					System.out.println("Rodada " + i + " Buffer " + buffSend.length);
+					while (count < RTT) {
+						sock = new DatagramSocket(3000);
+						DatagramPacket pack = new DatagramPacket(buffSend, buffSend.length, ip, 6789);
+						DatagramPacket reply = new DatagramPacket(buffReceive, buffReceive.length);
+
+						long tempoInicial = System.currentTimeMillis();
+
+						sock.send(pack);
+						sock.receive(reply); // bloqueante
+
+						System.out.print(System.currentTimeMillis() - tempoInicial + " - ");
+						++count;
+
+						sock.close();
+					}
+					System.out.println("Enviados: " + count);
 				}
 				System.out.println();
-				System.out.println("Enviados: " + count);
+				
 			}
 
 		} catch (SocketException e) {
