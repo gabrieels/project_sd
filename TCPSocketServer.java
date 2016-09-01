@@ -1,4 +1,8 @@
+package serialization;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
@@ -10,6 +14,7 @@ public class TCPSocketServer {
 	private ServerSocket listenSocket = null;
 	private Socket socket = null;
 	private OutputStream os = null;
+	private InputStream is = null;
 
 	public TCPSocketServer() {
 
@@ -20,12 +25,16 @@ public class TCPSocketServer {
 		try {
 			listenSocket = new ServerSocket(9876);
 			socket = listenSocket.accept();
-			os = socket.getOutputStream();
 
-			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+			byte[] incomingData = new byte[1024];
+			is = socket.getInputStream();
+			is.read(incomingData);
+
+			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(incomingData);
+			ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
 
 			try {
-				Student student = (Student) inputStream.readObject();
+				Student student = (Student) objectInputStream.readObject();
 				System.out.println("Student object received = " + student);
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
@@ -33,8 +42,9 @@ public class TCPSocketServer {
 
 			String reply = "Thank you for the message";
 			byte[] replyBytea = reply.getBytes();
+			os = socket.getOutputStream();
 			os.write(replyBytea);
-			
+
 			socket.close();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
