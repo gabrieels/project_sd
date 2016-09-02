@@ -1,9 +1,11 @@
-package rmi;
+package serialization.udp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.*;
+
+import serialization.Student;
 
 public class UDPSocketClient {
 	DatagramSocket Socket;

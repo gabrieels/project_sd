@@ -1,8 +1,11 @@
-package serialization;
+package serialization.tcp;
 
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+
+import serialization.Student;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
